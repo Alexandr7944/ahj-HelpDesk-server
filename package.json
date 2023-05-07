@@ -1,0 +1,29 @@
+{
+  "name": "ahj-helpdesk-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "prestart": "npm install",
+    "start": "forever app.js",
+    "watch": "forever -w app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Alexandr7944/ahj-HelpDesk-server.git"
+  },
+  "author": "A.S. Vasnev <sanek.vasnev@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Alexandr7944/ahj-HelpDesk-server/issues"
+  },
+  "homepage": "https://github.com/Alexandr7944/ahj-HelpDesk-server#readme",
+  "dependencies": {
+    "@koa/cors": "^4.0.0",
+    "forever": "^4.0.3",
+    "koa": "^2.14.2",
+    "koa-body": "^6.0.1",
+    "koa-static": "^5.0.0",
+    "uuid": "^9.0.0"
+  }
+}
