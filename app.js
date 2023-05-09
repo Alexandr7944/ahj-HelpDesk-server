@@ -4,7 +4,6 @@ const Koa = require('koa');
 const { koaBody } = require('koa-body');
 const cors = require('@koa/cors');
 const data = require('./data.json');
-const path = require('path');
 const { v4: uuidv4 } = require('uuid');
 
 const app = new Koa();
@@ -13,17 +12,9 @@ app.use(koaBody());
 const tickets = data;
 
 const updataJSON = () => {
-  // fs.writeFile('./data.json', JSON.stringify(tickets), (err) => {
-  //   if (err) {
-  //     console.error(err)
-  //     return
-  //   }
-  //   console.log('файл записан успешно');
-  // })
-
   try {
     fs.writeFileSync('./data.json', JSON.stringify(tickets))
-    console.log('файл записан успешно', data);
+    console.log('файл записан успешно');
   } catch (err) {
     console.error(err)
   }
@@ -46,8 +37,6 @@ app.use(async (ctx, next) => {
       return;
     case 'ticketById':
       const { id } = ctx.request.query;
-
-      console.log(ctx.request.query);
       const resp = tickets.ticketFull.filter((ticket) => ticket.id === id);
 
       resp.length
@@ -72,7 +61,7 @@ app.use(async (ctx, next) => {
   switch (method) {
     case 'createTicket':
       const { name, description } = JSON.parse(ctx.request.body);
-      const createTicket = {
+      let createTicket = {
         id: uuidv4(),
         name,
         status: false,
@@ -84,8 +73,8 @@ app.use(async (ctx, next) => {
         createTicket = {...createTicket, description};
         tickets.ticketFull.push(createTicket);
       }
-
-      ctx.response.body = createTicket;
+      
+      ctx.body = JSON.stringify(createTicket);
       updataJSON();
       return;
 
@@ -93,7 +82,8 @@ app.use(async (ctx, next) => {
       const id = JSON.parse(ctx.request.body);
       tickets.ticketFull = tickets.ticketFull.filter((item) => item.id !== id);
       tickets.ticket = tickets.ticket.filter((item) => item.id !== id);
-      ctx.response.status = 200;
+      
+      ctx.body = JSON.stringify({success: true});
       updataJSON();
       return;
 
@@ -110,21 +100,23 @@ app.use(async (ctx, next) => {
     return;
   }
 
+  const {id} = ctx.request.query;
   const ticketFull = JSON.parse(ctx.request.body);
   const ticket = {...ticketFull};
   delete ticket.description;
 
   ticketFull.description && 
-    tickets.ticketFull.forEach((item) => {
-      if (item.id !== ticketFull.id) return;
-      item = ticketFull;
+    tickets.ticketFull.forEach((item, index) => {
+      if (item.id !== id) return;
+      tickets.ticketFull[index] = ticketFull;
     });
 
-  tickets.ticket.forEach((item) => {
+  tickets.ticket.forEach((item, index) => {
     if (item.id !== ticket.id) return;
-    item = ticket;
-    ctx.body = JSON.stringify({"success": true});
+    tickets.ticket[index] = ticket;
   });
+  
+  ctx.body = JSON.stringify({"success": true});
   updataJSON();
 });
 
